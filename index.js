@@ -1,55 +1,86 @@
-var btn = document.getElementById("take-photo");
+var btn = document.getElementById("switch-cam");
 var devices = [];
-var selectedCamera = "";
+var selectedCamera = "env";
 
 function handleError(error) {
-  console.log(
-    "navigator.MediaDevices.getUserMedia error: ",
-    error.message,
-    error.name
-  );
+  console.log("Something went wrong: ", error.message, error.name);
 }
 
-function gotDevices(deviceInfos) {
+function getDevices(deviceInfos) {
   for (var i = 0; i !== deviceInfos.length; ++i) {
-    const deviceInfo = deviceInfos[i];
+    var deviceInfo = deviceInfos[i];
     if (deviceInfo.kind === "videoinput") {
-      const id = deviceInfo.deviceId;
+      var id = deviceInfo.deviceId;
       if (!devices.includes(id)) {
         devices.push(id);
       }
     }
   }
+}
+
+function switchCam(e) {
+  var constraints;
+
+  if (selectedCamera === "env") {
+    constraints = {
+      audio: false,
+      video: {
+        facingMode: "user",
+        width: {
+          ideal: 640,
+        },
+        height: {
+          ideal: 480,
+        },
+      },
+    };
+    selectedCamera = "user";
+  } else {
+    constraints = {
+      audio: false,
+      video: {
+        facingMode: "environment",
+        // deviceId: { exact: devices[1] },
+        width: {
+          ideal: 640,
+        },
+        height: {
+          ideal: 480,
+        },
+      },
+    };
+    selectedCamera = "env";
+  }
+  console.log("Contraints selected. Attempting to change camera...");
 
   var domElement = document.querySelector("#arjs-video");
 
   var oldStream = domElement.srcObject;
   oldStream.getTracks().forEach(function (track) {
     track.stop();
+    console.log("Current stream stopped");
   });
-
-  var videoSource = devices[0];
-  var constraints = {
-    audio: false,
-    video: { deviceId: videoSource ? { exact: videoSource } : undefined },
-  };
 
   navigator.mediaDevices
     .getUserMedia(constraints)
-    .then(function success(stream) {
+    .then(function (stream) {
+
+      // console.log(oldStream)
+      // console.log(devices);
+
       domElement.srcObject = stream;
 
       var event = new CustomEvent("camera-init", { stream: stream });
       window.dispatchEvent(event);
+      console.log("Event dispatched. Changing camera.");
 
       document.body.addEventListener("click", function () {
         domElement.play();
       });
-    });
+    })
+    .catch(handleError);
 }
 
-function takePicture(e) {
-  navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
-}
+navigator.mediaDevices.enumerateDevices().then(getDevices).catch(handleError);
 
-btn.addEventListener("click", takePicture);
+btn.addEventListener("click", switchCam);
