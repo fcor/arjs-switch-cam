@@ -1,4 +1,3 @@
-var btn = document.getElementById("switch-cam");
 var devices = [];
 var selectedCamera = "env";
 
@@ -40,7 +39,6 @@ function switchCam(e) {
       audio: false,
       video: {
         facingMode: "environment",
-        // deviceId: { exact: devices[1] },
         width: {
           ideal: 640,
         },
@@ -64,10 +62,7 @@ function switchCam(e) {
   navigator.mediaDevices
     .getUserMedia(constraints)
     .then(function (stream) {
-
-      // console.log(oldStream)
-      // console.log(devices);
-
+      
       domElement.srcObject = stream;
 
       var event = new CustomEvent("camera-init", { stream: stream });
