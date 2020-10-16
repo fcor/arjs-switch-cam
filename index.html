@@ -9,18 +9,20 @@
     <!-- rawgithack development URL -->
     <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
     <script src="aframe-ar.js"></script>
+    <script src="component.js"></script>
   </head>
 
   <body style="margin: 0px; overflow: hidden">
-    <div class="controls">
+    <!-- <div class="controls">
       <button id="switch-cam">Switch Cam</button>
-    </div>
+    </div> -->
 
     <a-scene
       embedded
       arjs="detectionMode: mono_and_matrix; matrixCodeType: 3x3_HAMMING63;"
       renderer="logarithmicDepthBuffer: true;"
       vr-mode-ui="enabled: false"
+      switch-camera
     >
       <a-assets>
         <a-asset-item
@@ -41,6 +43,5 @@
     </a-scene>
 
     <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-    <script src="index.js"></script>
   </body>
 </html>
